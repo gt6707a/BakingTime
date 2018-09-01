@@ -1,4 +1,4 @@
-package com.android.gt6707a.bakingtime.selectRecipe;
+package com.android.gt6707a.bakingtime.viewRecipes;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -18,11 +18,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import timber.log.Timber;
 
-public class SelectRecipeViewModel extends AndroidViewModel {
+public class ViewRecipesViewModel extends AndroidViewModel {
     private WebService webService;
-    private LiveData<List<Recipe>> recipeList;
 
-    public SelectRecipeViewModel(@NonNull Application application) {
+    public ViewRecipesViewModel(@NonNull Application application) {
         super(application);
 
         Retrofit retrofit = new Retrofit.Builder()
