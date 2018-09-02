@@ -42,5 +42,6 @@ dependencies {
         exclude module: 'support-v4'
         exclude module: 'support-v13'
         exclude module: 'recyclerview-v7'
+        exclude module: 'cardview-v7'
     }
 }

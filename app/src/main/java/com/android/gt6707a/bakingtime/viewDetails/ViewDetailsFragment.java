@@ -26,6 +26,9 @@ public class ViewDetailsFragment extends Fragment {
   @BindView(R.id.ingredients_recycler_view)
   RecyclerView ingredientsRecyclerView;
 
+  @BindView(R.id.steps_recycler_view)
+  RecyclerView stepsRecyclerView;
+
   public ViewDetailsFragment() {
     // Required empty public constructor
   }
@@ -46,6 +49,11 @@ public class ViewDetailsFragment extends Fragment {
     IngredientsAdapter ingredientsAdapter = new IngredientsAdapter(getActivity());
     ingredientsAdapter.setIngredientsList(recipe.getIngredients());
     ingredientsRecyclerView.setAdapter(ingredientsAdapter);
+
+    stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    StepsAdapter stepsAdapter = new StepsAdapter(getActivity());
+    stepsAdapter.setStepsList(recipe.getSteps());
+    stepsRecyclerView.setAdapter(stepsAdapter);
 
     return view;
   }
