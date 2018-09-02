@@ -5,15 +5,9 @@
     android:layout_height="match_parent"
     tools:context=".viewRecipes.ViewRecipesActivity">
 
-    <GridView
-        android:id="@+id/recipes_grid_view"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recipes_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:columnWidth="240dp"
-        android:numColumns="auto_fit"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
-        android:stretchMode="columnWidth"
-        android:gravity="center" />
+        android:layout_height="wrap_content" />
 
 </FrameLayout>
