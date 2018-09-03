@@ -1,9 +1,16 @@
 package com.android.gt6707a.bakingtime.viewDetails;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.android.gt6707a.bakingtime.R;
+import com.android.gt6707a.bakingtime.Utils;
+import com.android.gt6707a.bakingtime.entity.Recipe;
+import com.android.gt6707a.bakingtime.viewStepDetails.ViewStepDetailsActivity;
 
 public class ViewDetailsActivity extends AppCompatActivity {
 
@@ -11,5 +18,30 @@ public class ViewDetailsActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_view_details);
+
+    ViewDetailsViewModel viewDetailsViewModel =
+        ViewModelProviders.of(this).get(ViewDetailsViewModel.class);
+    viewDetailsViewModel
+        .getSelectedStepId()
+        .observe(
+            this,
+            new Observer<Integer>() {
+              @Override
+              public void onChanged(@Nullable Integer stepId) {
+                if (!Utils.hasTwoPanes(ViewDetailsActivity.this)) {
+                  viewStepDetails(stepId);
+                }
+              }
+            });
+  }
+
+  private void viewStepDetails(int stepId) {
+    Recipe recipe = getIntent().getParcelableExtra(getString(R.string.key_to_recipe));
+
+    Intent intent = new Intent(ViewDetailsActivity.this, ViewStepDetailsActivity.class);
+    intent.putExtra(getString(R.string.key_to_recipe), recipe);
+    intent.putExtra(getString(R.string.key_to_step_id), stepId);
+
+    startActivity(intent);
   }
 }

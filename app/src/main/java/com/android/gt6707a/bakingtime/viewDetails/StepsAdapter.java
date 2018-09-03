@@ -19,6 +19,7 @@ import butterknife.ButterKnife;
 public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.ViewHolder> {
 
   private Context context;
+  private ItemClickListener itemClickListener;
   private List<Step> stepsList;
 
   public void setStepsList(List<Step> stepsList) {
@@ -26,8 +27,13 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.ViewHolder> 
     notifyDataSetChanged();
   }
 
-  public StepsAdapter(Context context) {
+  public StepsAdapter(Context context, ItemClickListener listener) {
     this.context = context;
+    this.itemClickListener = listener;
+  }
+
+  public interface ItemClickListener {
+    void onItemClickListener(int stepId);
   }
 
   @NonNull
@@ -48,7 +54,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.ViewHolder> 
     return stepsList == null ? 0 : stepsList.size();
   }
 
-  class ViewHolder extends RecyclerView.ViewHolder {
+  class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     @BindView(R.id.short_description_text_view)
     TextView shortDescriptionTextView;
@@ -56,6 +62,12 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.ViewHolder> 
     public ViewHolder(View itemView) {
       super(itemView);
       ButterKnife.bind(this, itemView);
+      itemView.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+      itemClickListener.onItemClickListener(stepsList.get(getAdapterPosition()).getId());
     }
   }
 }

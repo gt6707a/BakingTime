@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".viewDetails.ViewDetailsActivity" />
+        <activity android:name=".viewStepDetails.ViewStepDetailsActivity"></activity>
     </application>
 
 </manifest>
