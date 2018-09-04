@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.gt6707a.bakingtime.R;
+import com.android.gt6707a.bakingtime.Utils;
 import com.android.gt6707a.bakingtime.entity.Recipe;
 import com.android.gt6707a.bakingtime.entity.Step;
 
@@ -24,6 +26,7 @@ public class ViewDetailsFragment extends Fragment implements StepsAdapter.ItemCl
 
   private ViewDetailsViewModel viewDetailsViewModel;
   private Recipe recipe;
+  private int stepId;
 
   @BindView(R.id.recipe_name_textview)
   TextView recipeNameTextView;
@@ -77,11 +80,23 @@ public class ViewDetailsFragment extends Fragment implements StepsAdapter.ItemCl
   @Override
   public void onActivityCreated(@Nullable Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
-    viewDetailsViewModel.select(0);
+    if (Utils.hasTwoPanes(getContext())) {
+      if (savedInstanceState != null) {
+        stepId = savedInstanceState.getInt("stepId");
+      }
+      viewDetailsViewModel.select(stepId);
+    }
+  }
+
+  @Override
+  public void onSaveInstanceState(@NonNull Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putInt("stepId", stepId);
   }
 
   @Override
   public void onItemClickListener(int stepId) {
     viewDetailsViewModel.select(stepId);
+    this.stepId = stepId;
   }
 }

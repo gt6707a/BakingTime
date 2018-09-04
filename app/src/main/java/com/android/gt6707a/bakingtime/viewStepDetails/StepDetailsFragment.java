@@ -60,6 +60,9 @@ public class StepDetailsFragment extends Fragment {
   @Nullable
   Button nextStepButton;
 
+  @BindView(R.id.no_video_text_view)
+  TextView noVideoTextView;
+
   private SimpleExoPlayer exoPlayer;
   private MediaSessionCompat mediaSession;
   private PlaybackStateCompat.Builder stateBuilder;
@@ -104,9 +107,11 @@ public class StepDetailsFragment extends Fragment {
                 descriptionTextView.setText(step.getDescription());
 
                 if (step.getVideoURL() == null || step.getVideoURL().isEmpty()) {
-                  playerView.setVisibility(View.INVISIBLE);
+                  noVideoTextView.setVisibility(View.VISIBLE);
+                  playerView.setVisibility(View.GONE);
                 } else {
                   initializePlayer(Uri.parse(step.getVideoURL()));
+                  noVideoTextView.setVisibility(View.GONE);
                   playerView.setVisibility(View.VISIBLE);
                 }
               }
@@ -145,6 +150,7 @@ public class StepDetailsFragment extends Fragment {
                   ViewGroup.LayoutParams params = playerView.getLayoutParams();
                   params.height = ((View) playerView.getParent()).getHeight();
                   playerView.setLayoutParams(params);
+                  noVideoTextView.setLayoutParams(params);
                 }
               });
     }
