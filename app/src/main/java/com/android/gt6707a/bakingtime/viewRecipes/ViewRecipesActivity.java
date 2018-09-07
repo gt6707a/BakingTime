@@ -13,6 +13,7 @@ import android.util.DisplayMetrics;
 import com.android.gt6707a.bakingtime.R;
 import com.android.gt6707a.bakingtime.entity.Recipe;
 import com.android.gt6707a.bakingtime.viewDetails.ViewDetailsActivity;
+import com.android.gt6707a.bakingtime.widget.WidgetService;
 
 import java.util.List;
 
