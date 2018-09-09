@@ -2,8 +2,6 @@ package com.android.gt6707a.bakingtime.viewStepDetails;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -65,9 +63,8 @@ public class StepDetailsFragment extends Fragment {
 
   private SimpleExoPlayer exoPlayer;
   private MediaSessionCompat mediaSession;
-  private PlaybackStateCompat.Builder stateBuilder;
 
-  private Recipe recipe;
+    private Recipe recipe;
   private int stepId;
 
   public StepDetailsFragment() {
@@ -192,13 +189,12 @@ public class StepDetailsFragment extends Fragment {
     mediaSession.setMediaButtonReceiver(null);
 
     // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
-    stateBuilder =
-        new PlaybackStateCompat.Builder()
-            .setActions(
-                PlaybackStateCompat.ACTION_PLAY
-                    | PlaybackStateCompat.ACTION_PAUSE
-                    | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-                    | PlaybackStateCompat.ACTION_PLAY_PAUSE);
+      PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
+              .setActions(
+                      PlaybackStateCompat.ACTION_PLAY
+                              | PlaybackStateCompat.ACTION_PAUSE
+                              | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                              | PlaybackStateCompat.ACTION_PLAY_PAUSE);
 
     mediaSession.setPlaybackState(stateBuilder.build());
 

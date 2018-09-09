@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.android.gt6707a.bakingtime.R;
 import com.android.gt6707a.bakingtime.Utils;
 import com.android.gt6707a.bakingtime.entity.Recipe;
-import com.android.gt6707a.bakingtime.entity.Step;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

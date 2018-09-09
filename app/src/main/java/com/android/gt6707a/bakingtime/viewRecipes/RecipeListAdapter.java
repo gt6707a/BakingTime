@@ -20,7 +20,7 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
 
   private final ItemClickListener itemClickListener;
 
-  private Context context;
+  private final Context context;
   private List<Recipe> recipeList;
 
   public void setRecipeList(List<Recipe> recipeList) {

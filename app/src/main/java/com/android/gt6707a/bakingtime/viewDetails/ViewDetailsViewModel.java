@@ -6,8 +6,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
-import com.android.gt6707a.bakingtime.entity.Step;
-
 public class ViewDetailsViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> selectedStepId = new MutableLiveData<>();
 

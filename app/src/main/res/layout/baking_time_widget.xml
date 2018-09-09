@@ -11,21 +11,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <TextView
             android:id="@+id/recipe_name_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:background="#09C"
-            android:contentDescription="Recipe Name"
             android:textColor="#ffffff"
-            android:textSize="24sp"
-            android:textStyle="bold|italic" />
+            android:textSize="18sp"
+            android:textStyle="bold|italic"
+            tools:text="Recipe Name" />
 
         <ListView
             android:id="@+id/ingredients_list_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
             tools:listitem="@layout/ingredient_layout">
 
         </ListView>
@@ -40,4 +43,5 @@
         android:textStyle="bold"
         android:text="@string/empty_view_text"
         android:textSize="20sp" />
+
 </FrameLayout>

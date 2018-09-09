@@ -19,7 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import timber.log.Timber;
 
 public class ViewRecipesViewModel extends AndroidViewModel {
-  private WebService webService;
+  private final WebService webService;
 
   public ViewRecipesViewModel(@NonNull Application application) {
     super(application);

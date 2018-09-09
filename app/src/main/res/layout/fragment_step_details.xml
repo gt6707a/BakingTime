@@ -60,7 +60,8 @@
         style="@style/Widget.AppCompat.Button.Borderless"
         android:text="@string/last_step"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="InconsistentLayout" />
 
     <Button
         android:id="@+id/next_step_button"

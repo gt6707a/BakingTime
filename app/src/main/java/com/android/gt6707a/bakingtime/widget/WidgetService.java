@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 
 import com.android.gt6707a.bakingtime.R;
-import com.android.gt6707a.bakingtime.entity.Recipe;
 
 public class WidgetService extends IntentService {
     public static final String ACTION_UPDATE_WIDGET = "com.android.gt6707a.bakingtime.action.update_widget";

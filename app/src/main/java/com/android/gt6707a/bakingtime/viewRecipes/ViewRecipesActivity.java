@@ -13,7 +13,6 @@ import android.util.DisplayMetrics;
 import com.android.gt6707a.bakingtime.R;
 import com.android.gt6707a.bakingtime.entity.Recipe;
 import com.android.gt6707a.bakingtime.viewDetails.ViewDetailsActivity;
-import com.android.gt6707a.bakingtime.widget.WidgetService;
 
 import java.util.List;
 
@@ -56,8 +55,7 @@ public class ViewRecipesActivity extends AppCompatActivity
   private int calculateNumberOfColumns() {
     DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
     float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-    int numberOfColumns = (int) (dpWidth / 240);
-    return numberOfColumns;
+    return (int) (dpWidth / 240);
   }
 
   @Override

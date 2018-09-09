@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.android.gt6707a.bakingtime.R;
-import com.android.gt6707a.bakingtime.entity.Step;
 import com.android.gt6707a.bakingtime.viewDetails.ViewDetailsViewModel;
 
 public class ViewStepDetailsActivity extends AppCompatActivity {

@@ -12,10 +12,9 @@ import com.android.gt6707a.bakingtime.entity.Ingredient;
 import com.android.gt6707a.bakingtime.entity.Recipe;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -30,14 +29,14 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
 
 class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
-  Context context;
-  int recipeId = -1;
+  final Context context;
+  int recipeId;
   List<Ingredient> ingredients;
 
   public WidgetRemoteViewsFactory(Context context, Intent intent) {
     this.context = context;
-    recipeId = intent.getIntExtra("test", -1);
-    Timber.d("Recipe Id is: " + recipeId);
+    recipeId = intent.getIntExtra("recipe", -1);
+    Timber.d("Recipe Id for this widget is: %s", recipeId);
   }
 
   @Override
@@ -45,23 +44,27 @@ class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
   @Override
   public void onDataSetChanged() {
-    Retrofit retrofit =
-        new Retrofit.Builder()
-            .baseUrl("https://d17h27t6h515a5.cloudfront.net")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
+    if (recipeId != -1) {
+      Retrofit retrofit =
+          new Retrofit.Builder()
+              .baseUrl("https://d17h27t6h515a5.cloudfront.net")
+              .addConverterFactory(GsonConverterFactory.create())
+              .build();
 
-    WebService webService = retrofit.create(WebService.class);
-    try{
+      WebService webService = retrofit.create(WebService.class);
+      try {
         Response<List<Recipe>> response = webService.getRecipeList().execute();
         for (Recipe recipe : response.body()) {
           if (recipe.getId() == recipeId) {
             ingredients = recipe.getIngredients();
-            Timber.d(ingredients.size() + " ingredients loaded");
+            Timber.d("%s ingredients loaded", ingredients.size());
           }
         }
-    } catch (IOException ex) {
+      } catch (IOException ex) {
         Timber.d(ex, "failed to load recipes");
+      }
+    } else {
+      ingredients = new ArrayList<>();
     }
   }
 
@@ -79,9 +82,14 @@ class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
       return null;
     }
 
-    RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.ingredient_layout);
-    rv.setTextViewText(
-        R.id.quantity_textview, String.valueOf(ingredients.get(position).getQuantity()));
+    Ingredient ingredient = ingredients.get(position);
+    String s =
+        String.format(
+            "%s %s of %s",
+            ingredient.getQuantity(), ingredient.getMeasure(), ingredient.getIngredient());
+
+    RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.ingredient_layout_widget);
+    rv.setTextViewText(R.id.quantity_textview, s);
 
     return rv;
   }

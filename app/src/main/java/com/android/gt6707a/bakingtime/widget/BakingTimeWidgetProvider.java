@@ -18,15 +18,16 @@ public class BakingTimeWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-        // Construct the RemoteViews object
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.baking_time_widget);
 
-        int recipeId = ConfigurationActivity.loadRecipeIdFromPref(context, appWidgetId);
+        String recipeName = ConfigurationActivity.loadRecipeNameFromPref(context, appWidgetId);
+        rv.setTextViewText(R.id.recipe_name_text_view, recipeName);
 
+        int recipeId = ConfigurationActivity.loadRecipeIdFromPref(context, appWidgetId);
         Intent intentToRemoteViewsService = new Intent(context, WidgetRemoteViewsService.class);
-        intentToRemoteViewsService.putExtra("test", recipeId);
+        intentToRemoteViewsService.putExtra("recipe", recipeId);
         rv.setRemoteAdapter(R.id.ingredients_list_view, intentToRemoteViewsService);
-        rv.setEmptyView(R.id.ingredients_widget_layout, R.id.empty_view);
+        rv.setEmptyView(R.id.ingredients_list_view, R.id.empty_view);
 
         Intent intent = new Intent(context, ViewRecipesActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
@@ -38,10 +39,6 @@ public class BakingTimeWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // There may be multiple widgets active, so update all of them
-//        for (int appWidgetId : appWidgetIds) {
-//            updateAppWidget(context, appWidgetManager, appWidgetId);
-//        }
         WidgetService.startActionUpdateWidget(context);
     }
 

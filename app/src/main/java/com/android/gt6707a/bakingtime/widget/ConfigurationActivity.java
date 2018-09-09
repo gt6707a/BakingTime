@@ -34,7 +34,8 @@ public class ConfigurationActivity extends AppCompatActivity
 
   private int widgetId;
   private static final String PREFS_NAME = "com.android.gt6707a.bakingtime.widget.BakingTimeWidgetProvider";
-  private static final String PREF_PREFIX_KEY = "recipe_widget_";
+  private static final String PREF_PREFIX_KEY_ID = "recipe_widget_id_";
+  private static final String PREF_PREFIX_KEY_NAME = "recipe_widget_name_";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +80,7 @@ public class ConfigurationActivity extends AppCompatActivity
   }
 
   private void showAppWidget(Recipe recipe) {
-    saveRecipeIdToPref(this, widgetId, recipe.getId());
+    saveRecipeIdToPref(this, widgetId, recipe);
 
     // TO DO, Perform the configuration and get an instance of the AppWidgetManager//
     AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
@@ -96,21 +97,21 @@ public class ConfigurationActivity extends AppCompatActivity
   }
 
   // Write the prefix to the SharedPreferences object for this widget
-  static void saveRecipeIdToPref(Context context, int appWidgetId, int recipeId) {
+  static void saveRecipeIdToPref(Context context, int appWidgetId, Recipe recipe) {
     SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
-    prefs.putInt(PREF_PREFIX_KEY + appWidgetId, recipeId);
-    prefs.commit();
+    prefs.putInt(PREF_PREFIX_KEY_ID + appWidgetId, recipe.getId());
+    prefs.putString(PREF_PREFIX_KEY_NAME + appWidgetId, recipe.getName());
+    prefs.apply();
   }
   // Read the prefix from the SharedPreferences object for this widget.
   // If there is no preference saved, get the default from a resource
   static int loadRecipeIdFromPref(Context context, int appWidgetId) {
     SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
-    int recipeId = prefs.getInt(PREF_PREFIX_KEY + appWidgetId, -1);
-    return recipeId;
+    return prefs.getInt(PREF_PREFIX_KEY_ID + appWidgetId, -1);
   }
-  static void deleteTitlePref(Context context, int appWidgetId) {
-  }
-  static void loadAllTitlePrefs(Context context, ArrayList<Integer> appWidgetIds,
-                                ArrayList<String> texts) {
+
+  static String loadRecipeNameFromPref(Context context, int appWidgetId) {
+    SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
+    return prefs.getString(PREF_PREFIX_KEY_NAME + appWidgetId, "");
   }
 }

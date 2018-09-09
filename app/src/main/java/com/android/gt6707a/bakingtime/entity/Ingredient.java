@@ -24,6 +24,8 @@ public class Ingredient
         this.ingredient = ingredient;
     }
 
+    public Ingredient() {}
+
     private Ingredient(Parcel in) {
         quantity = in.readDouble();
         measure = in.readString();
