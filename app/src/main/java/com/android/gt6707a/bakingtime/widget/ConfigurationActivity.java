@@ -84,7 +84,7 @@ public class ConfigurationActivity extends AppCompatActivity
 
     // TO DO, Perform the configuration and get an instance of the AppWidgetManager//
     AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-    BakingTimeWidgetProvider.updateAppWidget(this, appWidgetManager, widgetId);
+    BakingTimeWidgetProvider.updateAppWidget(this, appWidgetManager, widgetId, recipe.getId(), recipe.getName());
 
     // Create the return intent//
     Intent resultValue = new Intent();

@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.widget.RemoteViews;
 
 import com.android.gt6707a.bakingtime.R;
@@ -16,14 +17,11 @@ import com.android.gt6707a.bakingtime.viewRecipes.ViewRecipesActivity;
 public class BakingTimeWidgetProvider extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
+                                int appWidgetId, int recipeId, String recipeName) {
 
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.baking_time_widget);
-
-        String recipeName = ConfigurationActivity.loadRecipeNameFromPref(context, appWidgetId);
         rv.setTextViewText(R.id.recipe_name_text_view, recipeName);
 
-        int recipeId = ConfigurationActivity.loadRecipeIdFromPref(context, appWidgetId);
         Intent intentToRemoteViewsService = new Intent(context, WidgetRemoteViewsService.class);
         intentToRemoteViewsService.putExtra("recipe", recipeId);
         rv.setRemoteAdapter(R.id.ingredients_list_view, intentToRemoteViewsService);
@@ -35,6 +33,8 @@ public class BakingTimeWidgetProvider extends AppWidgetProvider {
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, rv);
+
+
     }
 
     @Override
@@ -54,7 +54,9 @@ public class BakingTimeWidgetProvider extends AppWidgetProvider {
 
     public static void updateWidgets(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId);
+            int recipeId = ConfigurationActivity.loadRecipeIdFromPref(context, appWidgetId);
+            String recipeName = ConfigurationActivity.loadRecipeNameFromPref(context, appWidgetId);
+            updateAppWidget(context, appWidgetManager, appWidgetId, recipeId, recipeName);
         }
     }
 }
