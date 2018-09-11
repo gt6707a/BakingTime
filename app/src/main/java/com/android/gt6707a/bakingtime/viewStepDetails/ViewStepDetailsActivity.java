@@ -19,10 +19,6 @@ public class ViewStepDetailsActivity extends AppCompatActivity {
       getSupportActionBar().setDisplayHomeAsUpEnabled(true);
       getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
-
-    ViewDetailsViewModel viewDetailsViewModel =
-        ViewModelProviders.of(this).get(ViewDetailsViewModel.class);
-    viewDetailsViewModel.select(getIntent().getIntExtra(getString(R.string.key_to_step_id), 0));
   }
 
   @Override

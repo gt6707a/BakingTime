@@ -81,6 +81,14 @@ public class StepDetailsFragment extends Fragment {
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    if (savedInstanceState != null) {
+      playerPosition = savedInstanceState.getLong(PLAYER_POSITION);
+      playWhenReady = savedInstanceState.getBoolean(PLAYER_PLAY_WHEN_READY);
+      stepId = savedInstanceState.getInt("stepid");
+    } else {
+      stepId = getActivity().getIntent().getIntExtra("stepId", 0);
+    }
+
     recipe = getActivity().getIntent().getParcelableExtra(getString(R.string.key_to_recipe));
   }
 
@@ -90,38 +98,6 @@ public class StepDetailsFragment extends Fragment {
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_step_details, container, false);
     ButterKnife.bind(this, view);
-
-    initializeMediaSession();
-
-    playerPosition = savedInstanceState.getLong(PLAYER_POSITION);
-    playWhenReady = savedInstanceState.getBoolean(PLAYER_PLAY_WHEN_READY);
-
-    viewDetailsViewModel = ViewModelProviders.of(getActivity()).get(ViewDetailsViewModel.class);
-    viewDetailsViewModel
-        .getSelectedStepId()
-        .observe(
-            this,
-            new Observer<Integer>() {
-              @Override
-              public void onChanged(@Nullable Integer stepId) {
-                StepDetailsFragment.this.stepId = stepId;
-
-                setNavigateButtonVisibilities();
-
-                // Ideally should match on stepId
-                Step step = recipe.getSteps().get(stepId);
-                descriptionTextView.setText(step.getDescription());
-
-                if (step.getVideoURL() == null || step.getVideoURL().isEmpty()) {
-                  noVideoTextView.setVisibility(View.VISIBLE);
-                  playerView.setVisibility(View.GONE);
-                } else {
-                  initializePlayer(Uri.parse(step.getVideoURL()));
-                  noVideoTextView.setVisibility(View.GONE);
-                  playerView.setVisibility(View.VISIBLE);
-                }
-              }
-            });
 
     return view;
   }
@@ -163,29 +139,53 @@ public class StepDetailsFragment extends Fragment {
   }
 
   @Override
+  public void onStart() {
+    super.onStart();
+    if (Util.SDK_INT > 23) {
+      initializeMediaSession();
+    }
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    if (Util.SDK_INT <= 23 || exoPlayer == null) {
+      initializeMediaSession();
+    }
+    // This is a hack to persist step because the viewModel initializes with 0.
+    // Given time, I would start new StepDetailsFragment when step is changed instead
+    // of maintaining state..
+    int currentStep = stepId;
+    initializeViewModel();
+    viewDetailsViewModel.select(currentStep);
+  }
+
+  @Override
   public void onSaveInstanceState(@NonNull Bundle outState) {
     super.onSaveInstanceState(outState);
-    if (exoPlayer != null) {
-      outState.putLong(PLAYER_POSITION, exoPlayer.getCurrentPosition());
-      outState.putBoolean(PLAYER_PLAY_WHEN_READY, exoPlayer.getPlayWhenReady());
-    }
+
+    outState.putLong(PLAYER_POSITION, playerPosition);
+    outState.putBoolean(PLAYER_PLAY_WHEN_READY, playWhenReady);
+    outState.putInt("stepid", stepId);
   }
 
   @Optional
   @OnClick(R.id.last_step_button)
   public void toLast() {
-    if (exoPlayer != null) {
-      exoPlayer.stop();
-    }
+    releasePlayer();
+    initializeMediaSession();
+    playerPosition = 0;
+    playWhenReady = true;
     viewDetailsViewModel.select(--stepId);
   }
 
   @Optional
   @OnClick(R.id.next_step_button)
   public void toNext() {
-    if (exoPlayer != null) {
-      exoPlayer.stop();
-    }
+    releasePlayer();
+    initializeMediaSession();
+    playerPosition = 0;
+    playWhenReady = true;
     viewDetailsViewModel.select(++stepId);
   }
 
@@ -222,14 +222,7 @@ public class StepDetailsFragment extends Fragment {
 
     // Start the Media Session since the activity is active.
     mediaSession.setActive(true);
-  }
 
-  /**
-   * Initialize ExoPlayer.
-   *
-   * @param mediaUri The URI of the sample to play.
-   */
-  private void initializePlayer(Uri mediaUri) {
     if (exoPlayer == null) {
       // Create an instance of the ExoPlayer.
       TrackSelector trackSelector = new DefaultTrackSelector();
@@ -237,31 +230,71 @@ public class StepDetailsFragment extends Fragment {
       exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector, loadControl);
       playerView.setPlayer(exoPlayer);
     }
-    // Prepare the MediaSource.
-    String userAgent = Util.getUserAgent(getActivity(), "BakingTime");
+  }
 
-    MediaSource mediaSource =
-        new ExtractorMediaSource(
-            mediaUri,
-            new DefaultDataSourceFactory(getActivity(), userAgent),
-            new DefaultExtractorsFactory(),
-            null,
-            null);
-    exoPlayer.prepare(mediaSource);
-    exoPlayer.seekTo(playerPosition);
-    exoPlayer.setPlayWhenReady(playWhenReady);
+  private void initializeViewModel() {
+    viewDetailsViewModel = ViewModelProviders.of(getActivity()).get(ViewDetailsViewModel.class);
+    viewDetailsViewModel
+        .getSelectedStepId()
+        .observe(
+            this,
+            new Observer<Integer>() {
+              @Override
+              public void onChanged(@Nullable Integer stepId) {
+                StepDetailsFragment.this.stepId = stepId;
+
+                setNavigateButtonVisibilities();
+
+                // Ideally should match on stepId
+                Step step = recipe.getSteps().get(stepId);
+                descriptionTextView.setText(step.getDescription());
+
+                if (step.getVideoURL() == null || step.getVideoURL().isEmpty()) {
+                  noVideoTextView.setVisibility(View.VISIBLE);
+                  playerView.setVisibility(View.GONE);
+                } else {
+                  // Prepare the MediaSource.
+                  String userAgent = Util.getUserAgent(getActivity(), "BakingTime");
+
+                  MediaSource mediaSource =
+                      new ExtractorMediaSource(
+                          Uri.parse(step.getVideoURL()),
+                          new DefaultDataSourceFactory(getActivity(), userAgent),
+                          new DefaultExtractorsFactory(),
+                          null,
+                          null);
+                  exoPlayer.prepare(mediaSource);
+                  exoPlayer.seekTo(playerPosition);
+                  exoPlayer.setPlayWhenReady(playWhenReady);
+
+                  noVideoTextView.setVisibility(View.GONE);
+                  playerView.setVisibility(View.VISIBLE);
+                }
+              }
+            });
   }
 
   @Override
-  public void onDestroy() {
-    super.onDestroy();
-    releasePlayer();
-    mediaSession.setActive(false);
+  public void onPause() {
+    super.onPause();
+    if (Util.SDK_INT <= 23) {
+      releasePlayer();
+    }
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    if (Util.SDK_INT > 23) {
+      releasePlayer();
+    }
   }
 
   /** Release ExoPlayer. */
   private void releasePlayer() {
     if (exoPlayer != null) {
+      playerPosition = exoPlayer.getCurrentPosition();
+      playWhenReady = exoPlayer.getPlayWhenReady();
       exoPlayer.stop();
       exoPlayer.release();
       exoPlayer = null;
