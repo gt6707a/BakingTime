@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -42,6 +43,8 @@ import butterknife.Optional;
 public class StepDetailsFragment extends Fragment {
 
   private static final String TAG = StepDetailsFragment.class.getSimpleName();
+  private static final String PLAYER_POSITION = "playerPosition";
+  private static final String PLAYER_PLAY_WHEN_READY = "playWhenReady";
   private ViewDetailsViewModel viewDetailsViewModel;
 
   @BindView(R.id.playerView)
@@ -64,8 +67,11 @@ public class StepDetailsFragment extends Fragment {
   private SimpleExoPlayer exoPlayer;
   private MediaSessionCompat mediaSession;
 
-    private Recipe recipe;
+  private Recipe recipe;
   private int stepId;
+
+  private long playerPosition;
+  private boolean playWhenReady = true;
 
   public StepDetailsFragment() {
     // Required empty public constructor
@@ -86,6 +92,9 @@ public class StepDetailsFragment extends Fragment {
     ButterKnife.bind(this, view);
 
     initializeMediaSession();
+
+    playerPosition = savedInstanceState.getLong(PLAYER_POSITION);
+    playWhenReady = savedInstanceState.getBoolean(PLAYER_PLAY_WHEN_READY);
 
     viewDetailsViewModel = ViewModelProviders.of(getActivity()).get(ViewDetailsViewModel.class);
     viewDetailsViewModel
@@ -153,6 +162,15 @@ public class StepDetailsFragment extends Fragment {
     }
   }
 
+  @Override
+  public void onSaveInstanceState(@NonNull Bundle outState) {
+    super.onSaveInstanceState(outState);
+    if (exoPlayer != null) {
+      outState.putLong(PLAYER_POSITION, exoPlayer.getCurrentPosition());
+      outState.putBoolean(PLAYER_PLAY_WHEN_READY, exoPlayer.getPlayWhenReady());
+    }
+  }
+
   @Optional
   @OnClick(R.id.last_step_button)
   public void toLast() {
@@ -189,12 +207,13 @@ public class StepDetailsFragment extends Fragment {
     mediaSession.setMediaButtonReceiver(null);
 
     // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
-      PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
-              .setActions(
-                      PlaybackStateCompat.ACTION_PLAY
-                              | PlaybackStateCompat.ACTION_PAUSE
-                              | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-                              | PlaybackStateCompat.ACTION_PLAY_PAUSE);
+    PlaybackStateCompat.Builder stateBuilder =
+        new PlaybackStateCompat.Builder()
+            .setActions(
+                PlaybackStateCompat.ACTION_PLAY
+                    | PlaybackStateCompat.ACTION_PAUSE
+                    | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                    | PlaybackStateCompat.ACTION_PLAY_PAUSE);
 
     mediaSession.setPlaybackState(stateBuilder.build());
 
@@ -229,7 +248,8 @@ public class StepDetailsFragment extends Fragment {
             null,
             null);
     exoPlayer.prepare(mediaSource);
-    exoPlayer.setPlayWhenReady(true);
+    exoPlayer.seekTo(playerPosition);
+    exoPlayer.setPlayWhenReady(playWhenReady);
   }
 
   @Override
