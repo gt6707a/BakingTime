@@ -4,13 +4,17 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 
 import com.android.gt6707a.bakingtime.R;
+import com.android.gt6707a.bakingtime.SimpleIdlingResource;
 import com.android.gt6707a.bakingtime.entity.Recipe;
 import com.android.gt6707a.bakingtime.viewDetails.ViewDetailsActivity;
 
@@ -39,9 +43,11 @@ public class ViewRecipesActivity extends AppCompatActivity
     recipeListAdapter = new RecipeListAdapter(this, this);
     recipesRecyclerView.setAdapter(recipeListAdapter);
 
+    getIdlingResource();
+
     ViewRecipesViewModel viewModel = ViewModelProviders.of(this).get(ViewRecipesViewModel.class);
     viewModel
-        .getRecipeList()
+        .getRecipeList(mIdlingResource)
         .observe(
             this,
             new Observer<List<Recipe>>() {
@@ -50,6 +56,7 @@ public class ViewRecipesActivity extends AppCompatActivity
                 recipeListAdapter.setRecipeList(recipes);
               }
             });
+
   }
 
   private int calculateNumberOfColumns() {
@@ -63,5 +70,16 @@ public class ViewRecipesActivity extends AppCompatActivity
     Intent intent = new Intent(ViewRecipesActivity.this, ViewDetailsActivity.class);
     intent.putExtra(getString(R.string.key_to_recipe), recipe);
     startActivity(intent);
+  }
+
+  @Nullable private SimpleIdlingResource mIdlingResource;
+
+  @VisibleForTesting
+  @NonNull
+  public IdlingResource getIdlingResource() {
+    if (mIdlingResource == null) {
+      mIdlingResource = new SimpleIdlingResource();
+    }
+    return mIdlingResource;
   }
 }

@@ -51,7 +51,7 @@ public class ConfigurationActivity extends AppCompatActivity
 
     ViewRecipesViewModel viewModel = ViewModelProviders.of(this).get(ViewRecipesViewModel.class);
     viewModel
-        .getRecipeList()
+        .getRecipeList(null)
         .observe(
             this,
             new Observer<List<Recipe>>() {

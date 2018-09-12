@@ -5,7 +5,10 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.test.espresso.IdlingResource;
 
+import com.android.gt6707a.bakingtime.SimpleIdlingResource;
 import com.android.gt6707a.bakingtime.WebService;
 import com.android.gt6707a.bakingtime.entity.Recipe;
 
@@ -32,8 +35,12 @@ public class ViewRecipesViewModel extends AndroidViewModel {
     webService = retrofit.create(WebService.class);
   }
 
-  public LiveData<List<Recipe>> getRecipeList() {
+  public LiveData<List<Recipe>> getRecipeList(@Nullable final SimpleIdlingResource idlingResource) {
     final MutableLiveData<List<Recipe>> data = new MutableLiveData<>();
+
+    if (idlingResource != null) {
+        idlingResource.setIdleState(false);
+    }
     webService
         .getRecipeList()
         .enqueue(
@@ -41,11 +48,17 @@ public class ViewRecipesViewModel extends AndroidViewModel {
               @Override
               public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
                 data.setValue(response.body());
+                  if (idlingResource != null) {
+                      idlingResource.setIdleState(true);
+                  }
               }
 
               @Override
               public void onFailure(Call<List<Recipe>> call, Throwable t) {
                 Timber.d(t, "Failed to get recipes.");
+                  if (idlingResource != null) {
+                      idlingResource.setIdleState(true);
+                  }
               }
             });
     return data;

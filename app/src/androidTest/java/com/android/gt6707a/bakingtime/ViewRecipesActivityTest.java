@@ -1,5 +1,7 @@
 package com.android.gt6707a.bakingtime;
 
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.IdlingResource;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
@@ -7,6 +9,8 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.android.gt6707a.bakingtime.viewRecipes.ViewRecipesActivity;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,12 +25,30 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 @LargeTest
 public class ViewRecipesActivityTest {
 
-    @Rule
-    public ActivityTestRule<ViewRecipesActivity> mActivityTestRule = new ActivityTestRule<>(ViewRecipesActivity.class);
+  @Rule
+  public ActivityTestRule<ViewRecipesActivity> mActivityTestRule =
+      new ActivityTestRule<>(ViewRecipesActivity.class);
 
-    @Test
-    public void navigatesToViewDetailsActivityWhenClicked() {
-        onView(withId(R.id.recipes_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
-        onView(withId(R.id.recipe_name_textview)).check(matches(withText("Nutella Pie")));
+  private IdlingResource mIdlingResource;
+
+  @Before
+  public void registerIdlingResource() {
+    mIdlingResource = mActivityTestRule.getActivity().getIdlingResource();
+    // To prove that the test fails, omit this call:
+    Espresso.registerIdlingResources(mIdlingResource);
+  }
+
+  @Test
+  public void navigatesToViewDetailsActivityWhenClicked() {
+    onView(withId(R.id.recipes_recycler_view))
+        .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+    onView(withId(R.id.recipe_name_textview)).check(matches(withText("Nutella Pie")));
+  }
+
+  @After
+  public void unregisterIdlingResource() {
+    if (mIdlingResource != null) {
+      Espresso.unregisterIdlingResources(mIdlingResource);
     }
+  }
 }
